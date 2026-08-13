@@ -6,7 +6,7 @@ class Quiz:
 
     def display(self):
         print(self.question)
-        print("")
+        print()
         for idx, choice in enumerate(self.choices):
             print(f"{idx + 1}. {choice}")
 
