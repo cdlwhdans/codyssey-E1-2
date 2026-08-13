@@ -1,6 +1,7 @@
+from default_quizzes import create_default_quizzes
 class QuizGame:
     def __init__(self):
-        self.quizzes = []
+        self.quizzes = create_default_quizzes()
         self.best_score = None
 
     def run(self):
