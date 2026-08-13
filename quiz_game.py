@@ -1,9 +1,15 @@
-from default_quizzes import create_default_quizzes
+import json
+from pathlib import Path
 
+from default_quizzes import create_default_quizzes
+from quiz import Quiz
+
+STATE_FILE = Path(__file__).resolve().parent / "state.json"
 class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
         self.best_score = 0
+        self.load_state()
 
     def run(self):
         while True:
@@ -62,8 +68,10 @@ class QuizGame:
         print("\n========================================")
         print(f"🏆 결과: {total_count}문제 중 {correct_count}문제 정답! ({score}점)")
         if score > self.best_score:
-            print("🎉 새로운 최고 점수입니다!")
             self.best_score = score
+            self.save_state()
+            print("🎉 새로운 최고 점수입니다!")
+            
         print()
 
     def add_quiz(self):
@@ -76,10 +84,57 @@ class QuizGame:
         pass
 
     def save_state(self):
-        pass
+        data = {
+            "quizzes": [
+                {
+                    "question": quiz.question,
+                    "choices": quiz.choices,
+                    "answer": quiz.answer,
+                }
+                for quiz in self.quizzes
+            ],
+            "best_score": self.best_score,
+        }
+        try:
+            with open(STATE_FILE, "w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except OSError as error:
+            print(f"데이터를 저장하지 못했습니다: {error}")
+
 
     def load_state(self):
-        pass
+        try:
+            with open(STATE_FILE, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            quizzes = [
+                Quiz(
+                    quiz_data["question"],
+                    quiz_data["choices"],
+                    quiz_data["answer"],
+                )
+                for quiz_data in data["quizzes"]
+            ]
+
+            best_score = data["best_score"]
+
+            self.quizzes = quizzes
+            self.best_score = best_score
+
+            print(
+                f"저장된 데이터를 불러왔습니다. "
+                f"(퀴즈 {len(self.quizzes)}개, 최고 점수 {self.best_score}점)"
+            )
+
+        except FileNotFoundError:
+            print("저장된 데이터가 없어 기본 퀴즈를 사용합니다.")
+
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+            print("저장 파일이 손상되어 기본 퀴즈를 사용합니다.")
+
+        except OSError as error:
+            print(f"데이터를 불러오지 못해 기본 퀴즈를 사용합니다: {error}")
+        
 
     def _get_valid_number(self, prompt, minimum, maximum):
         while True:
