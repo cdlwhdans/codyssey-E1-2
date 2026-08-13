@@ -75,7 +75,18 @@ class QuizGame:
         print()
 
     def add_quiz(self):
-        pass
+        print("\n📌 새로운 퀴즈를 추가합니다.")
+        question = self._get_valid_input("문제를 입력하세요: ")
+
+        choices = []
+        for i in range(1, 5):
+            choices.append(self._get_valid_input(f"선택지 {i}: "))
+
+        answer = self._get_valid_number("정답 번호 (1-4): ", 1, 4)
+
+        self.quizzes.append(Quiz(question, choices, answer))
+        self.save_state()
+        print("\n✅ 퀴즈가 추가되었습니다!")
 
     def show_quizzes(self):
         pass
@@ -155,3 +166,11 @@ class QuizGame:
                 continue
 
             return number
+
+    def _get_valid_input(self, prompt):
+        while True:
+            user_input = input(prompt).strip()
+            if user_input:
+                return user_input
+            print("빈 값은 입력할 수 없습니다. 다시 입력해주세요.")
+
