@@ -89,7 +89,14 @@ class QuizGame:
         print("\n✅ 퀴즈가 추가되었습니다!")
 
     def show_quizzes(self):
-        pass
+        if not len(self.quizzes):
+            print("\n등록된 퀴즈가 없습니다.")
+            return
+        print(f"📋 등록된 퀴즈 목록 (총 {len(self.quizzes)}개)")
+        print("----------------------------------------")
+        for idx, quiz in enumerate(self.quizzes):
+            print(f"[{idx+1}] {quiz.question}")
+        print("----------------------------------------")
 
     def show_best_score(self):
         pass
