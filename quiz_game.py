@@ -46,13 +46,15 @@ class QuizGame:
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
             return
-        question_count = self._get_valid_number(f"풀 문제 수를 입력하세요 (1~{len(self.quizzes)}): ", 1, len(self.quizzes))
+        question_count = self._get_valid_number(
+            f"풀 문제 수를 입력하세요 (1~{len(self.quizzes)}): ", 1, len(self.quizzes))
 
         quiz_list = self.quizzes.copy()
         random.shuffle(quiz_list)
         quiz_list = quiz_list[:question_count]
 
         correct_count = 0
+        hint_count = 0
         total_count = len(quiz_list)
 
         print(f"\n📝 퀴즈를 시작합니다! (총 {total_count}문제)")
@@ -61,6 +63,12 @@ class QuizGame:
             print("\n----------------------------------------")
             print(f"문제 [{idx + 1}]") 
             quiz.display()
+
+            use_hint = self._get_yes_or_no("힌트를 사용하시겠습니까? (y/n): ")
+
+            if use_hint:
+                quiz.show_hint()
+                hint_count += 1
 
             user_answer = self._get_valid_number("정답 입력: ", 1, 4)
 
@@ -71,8 +79,13 @@ class QuizGame:
                 print("오답입니다!")
 
         score = int(100 * correct_count / total_count)
+        penalty = hint_count * 10
+        score = max(0, score - penalty)
+
         print("\n========================================")
         print(f"🏆 결과: {total_count}문제 중 {correct_count}문제 정답! ({score}점)")
+        if hint_count:
+            print(f"힌트 사용: {hint_count}회 (-{penalty}점)")
         if self.best_score is None or score > self.best_score:
             self.best_score = score
             self.save_state()
@@ -90,7 +103,9 @@ class QuizGame:
 
         answer = self._get_valid_number("정답 번호 (1-4): ", 1, 4)
 
-        self.quizzes.append(Quiz(question, choices, answer))
+        hint = self._get_valid_input("힌트를 입력하세요: ")
+
+        self.quizzes.append(Quiz(question, choices, answer, hint))
         self.save_state()
         print("\n✅ 퀴즈가 추가되었습니다!")
 
@@ -197,3 +212,14 @@ class QuizGame:
                 return user_input
             print("빈 값은 입력할 수 없습니다. 다시 입력해주세요.")
 
+    def _get_yes_or_no(self, prompt):
+        while True:
+            value = input(prompt).strip().lower()
+
+            if value == "y":
+                return True
+
+            if value == "n":
+                return False
+
+            print("y 또는 n을 입력해 주세요.")
