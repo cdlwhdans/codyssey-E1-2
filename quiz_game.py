@@ -106,19 +106,14 @@ class QuizGame:
 
     def save_state(self):
         data = {
-            "quizzes": [
-                {
-                    "question": quiz.question,
-                    "choices": quiz.choices,
-                    "answer": quiz.answer,
-                }
-                for quiz in self.quizzes
-            ],
+            "quizzes": [quiz.to_dict() for quiz in self.quizzes],
             "best_score": self.best_score,
         }
+
         try:
             with open(STATE_FILE, "w", encoding="utf-8") as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
+
         except OSError as error:
             print(f"데이터를 저장하지 못했습니다: {error}")
 
@@ -128,23 +123,35 @@ class QuizGame:
             with open(STATE_FILE, "r", encoding="utf-8") as file:
                 data = json.load(file)
 
-            quizzes = [
-                Quiz(
-                    quiz_data["question"],
-                    quiz_data["choices"],
-                    quiz_data["answer"],
-                )
-                for quiz_data in data["quizzes"]
-            ]
+            if not isinstance(data, dict):
+                raise ValueError
 
+            quizzes_data = data["quizzes"]
             best_score = data["best_score"]
+
+            if not isinstance(quizzes_data, list):
+                raise ValueError
+
+            if best_score is not None:
+                if type(best_score) is not int or not 0 <= best_score <= 100:
+                    raise ValueError
+
+            quizzes = [
+                Quiz.from_dict(quiz_data)
+                for quiz_data in quizzes_data
+            ]
 
             self.quizzes = quizzes
             self.best_score = best_score
 
+            if self.best_score is None:
+                score_message = "플레이 기록 없음"
+            else:
+                score_message = f"최고 점수 {self.best_score}점"
+
             print(
                 f"저장된 데이터를 불러왔습니다. "
-                f"(퀴즈 {len(self.quizzes)}개, 최고 점수 {self.best_score}점)"
+                f"(퀴즈 {len(self.quizzes)}개, {score_message})"
             )
 
         except FileNotFoundError:
