@@ -25,6 +25,8 @@ class QuizGame:
             elif choice == 4:
                 self.show_best_score()
             elif choice == 5:
+                self.delete_quiz()
+            elif choice == 6:
                 print("게임을 종료합니다.")
                 break
 
@@ -38,7 +40,8 @@ class QuizGame:
 2. 퀴즈 추가
 3. 퀴즈 목록
 4. 점수 확인
-5. 종료
+5. 퀴즈 삭제
+6. 종료
 ========================================"""
             )
 
@@ -184,6 +187,31 @@ class QuizGame:
         except OSError as error:
             print(f"데이터를 불러오지 못해 기본 퀴즈를 사용합니다: {error}")
         
+    def delete_quiz(self):
+        if not self.quizzes:
+            print("삭제할 퀴즈가 없습니다.")
+            return
+
+        self.show_quizzes()
+
+        quiz_number = self._get_valid_number(
+            f"삭제할 퀴즈 번호를 입력하세요 (1~{len(self.quizzes)}): ", 1, len(self.quizzes))
+
+        quiz = self.quizzes[quiz_number - 1]
+
+        confirm = self._get_yes_or_no(
+            f"'{quiz.question}' 퀴즈를 삭제하시겠습니까? (y/n): "
+        )
+
+        if not confirm:
+            print("퀴즈 삭제를 취소했습니다.")
+            return
+
+        deleted_quiz = self.quizzes.pop(quiz_number - 1)
+        self.save_state()
+
+        print(f"✅ '{deleted_quiz.question}' 퀴즈가 삭제되었습니다.")
+
 
     def _get_valid_number(self, prompt, minimum, maximum):
         while True:
