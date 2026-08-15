@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import random
 
 from default_quizzes import create_default_quizzes
 from quiz import Quiz
@@ -45,13 +46,18 @@ class QuizGame:
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
             return
-        
+        question_count = self._get_valid_number(f"풀 문제 수를 입력하세요 (1~{len(self.quizzes)}): ", 1, len(self.quizzes))
+
+        quiz_list = self.quizzes.copy()
+        random.shuffle(quiz_list)
+        quiz_list = quiz_list[:question_count]
+
         correct_count = 0
-        total_count = len(self.quizzes)
+        total_count = len(quiz_list)
 
         print(f"\n📝 퀴즈를 시작합니다! (총 {total_count}문제)")
 
-        for idx, quiz in enumerate(self.quizzes):
+        for idx, quiz in enumerate(quiz_list):
             print("\n----------------------------------------")
             print(f"문제 [{idx + 1}]") 
             quiz.display()
