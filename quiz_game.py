@@ -8,7 +8,7 @@ STATE_FILE = Path(__file__).resolve().parent / "state.json"
 class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
-        self.best_score = 0
+        self.best_score = None
         self.load_state()
 
     def run(self):
@@ -67,7 +67,7 @@ class QuizGame:
         score = int(100 * correct_count / total_count)
         print("\n========================================")
         print(f"🏆 결과: {total_count}문제 중 {correct_count}문제 정답! ({score}점)")
-        if score > self.best_score:
+        if self.best_score is None or score > self.best_score:
             self.best_score = score
             self.save_state()
             print("🎉 새로운 최고 점수입니다!")
@@ -99,7 +99,10 @@ class QuizGame:
         print("----------------------------------------")
 
     def show_best_score(self):
-        pass
+        if self.best_score is None:
+            print("아직 문제를 푼 기록이 없습니다.")
+        else:
+            print(f"🏆 최고 점수: {self.best_score}점")
 
     def save_state(self):
         data = {
