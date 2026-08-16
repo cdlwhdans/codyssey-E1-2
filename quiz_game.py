@@ -86,7 +86,7 @@ class QuizGame:
                 print("오답입니다!")
 
         score = int(100 * correct_count / total_count)
-        penalty = hint_count * 10
+        penalty = int(50 * hint_count / total_count)
         score = max(0, score - penalty)
         record = {
             "played_at": datetime.now().isoformat(timespec="seconds"),
