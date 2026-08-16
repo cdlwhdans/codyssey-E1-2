@@ -274,3 +274,4 @@ git log --oneline --graph --all
 - [퀴즈 삭제](docs/screenshots/5.png)
 - [최고 점수와 점수 기록](docs/screenshots/6.png)
 - [Git 브랜치와 커밋 기록](docs/screenshots/7.png)
+Git 저장소 복제 실습
